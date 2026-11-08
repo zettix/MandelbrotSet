@@ -45,7 +45,8 @@ class RenderConfig {
   }
 
   private static void Help() {
-    System.out.println("Usage:");
+    System.out.println("Usage: arguments with slash means value must be specified.");
+    System.out.println("-h  Help (this).");
     System.out.println("-cx /center x/");
     System.out.println("-cy /center y/");
     System.out.println("-mx /mag x/");
@@ -54,6 +55,8 @@ class RenderConfig {
     System.out.println("-ry /resolution y/");
     System.out.println("-i /max iterations/");
     System.out.println("-q quiet");
+    System.out.println("-f /frame number/");
+    System.exit(0);
   }
 
   public static RenderConfig parse(String[] args) {
@@ -78,41 +81,37 @@ class RenderConfig {
               if (arg.equals("-cx")) {
                   idx++;
                   rc.setCenterX(args[idx]);
-              }
-              if (arg.equals("-cy")) {
+              } else if (arg.equals("-cy")) {
                   idx++;
                   rc.setCenterY(args[idx]);
-              }
-              if (arg.equals("-mx")) {
+              } else if (arg.equals("-mx")) {
                   idx++;
                   rc.setMagX(args[idx]);
-              }
-              if (arg.equals("-my")) {
+              } else if (arg.equals("-my")) {
                   idx++;
                   rc.setMagY(args[idx]);
-              }
-              if (arg.equals("-rx")) {
+              } else if (arg.equals("-rx")) {
                   idx++;
                   rc.setResX(Integer.parseInt(args[idx]));
-              }
-              if (arg.equals("-ry")) {
+              } else if (arg.equals("-ry")) {
                   idx++;
                   rc.setResY(Integer.parseInt(args[idx]));
-              }
-              if (arg.equals("-i")) {
+              } else if (arg.equals("-i")) {
                   idx++;
                   rc.setMaxIterations(Integer.parseInt(args[idx]));
-              }
-              if (arg.equals("-p")) {
+              } else if (arg.equals("-p")) {
                   idx++;
                   rc.setPrecision(Integer.parseInt(args[idx]));
-              }
-              if (arg.equals("-f")) {
+              } else if (arg.equals("-f")) {
                   idx++;
                   rc.setFrame(Integer.parseInt(args[idx]));
-              }
-              if (arg.equals("-q")) {
+              } else if (arg.equals("-q")) {
                   rc.setQuiet(true);
+              } else if (arg.equals("-h")) {
+                  Help();
+              } else {
+                  System.err.println("ERROR: unknown argument: " + arg);
+                  Help();
               }
               idx++;
            }
@@ -152,6 +151,8 @@ class RenderConfig {
             pargs.add("-f");
           } else if (key.equals("xres")) {
             pargs.add("-rx");
+          } else if (key.equals("precision")) {
+            pargs.add("-p");
           } else if (key.equals("yres")) {
             pargs.add("-ry");
           } else if (key.equals("max_iterations")) {

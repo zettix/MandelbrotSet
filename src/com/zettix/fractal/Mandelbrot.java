@@ -150,20 +150,30 @@ class Mandelbrot {
               ypos = ypos.add(y_inc, mc);
               BigDecimal xpos = (minX.add(x_inc.negate()));
               ExecutorService executor = Executors.newFixedThreadPool(poolsize);
-              for (int x = 0; x < xr; x++) {
-                  xpos = xpos.add(x_inc, mc);
-                  Callable<Void> t = new EscapeRunnable(xpos, ypos, far,
-                      maxcount, mc, buff, x, y);
+              int x = 0;
+              int x_step = 32;
+              while (x < xr) {  // batch 32 pixels at a time to reduce overhead of thread creation and destruction.
+                  int x_end = Math.min(x + x_step, xr);
+                  int[] x_indicies = new int[x_end - x];
+                  BigDecimal[] xposes = new BigDecimal[x_end - x];
+                  for (int i = 0; i < x_indicies.length; i++) {
+                      x_indicies[i] = x + i;
+                      xposes[i] = xpos.add(x_inc.multiply(new BigDecimal(i), mc));
+                  }
+                  Callable<Void> t = new EscapeRunnable(xposes, ypos, far, maxcount, mc, buff, x_indicies);
                   executor.submit(t);
+                  x += x_step;
               }
+
               executor.shutdown();
               try {
                   executor.awaitTermination(1000l, TimeUnit.SECONDS);
               } catch (InterruptedException e) {
                   System.err.println("Executor interrupted: " + e);
               }
-              for (int x = 0; x < xr; x++) {
-                  sb.append(buff[x]);
+
+              for (int idx = 0; idx < xr; idx++) {
+                  sb.append(buff[idx]);
                   sb.append(" ");
               }
               if (! quiet) {
